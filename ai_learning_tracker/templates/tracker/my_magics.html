@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div class="stat-card">
             <div class="text-2xl font-semibold text-gray-900">{{ logs_with_files|length }}</div>
-            <div class="text-sm text-gray-600 mt-1">Total Uploads</div>
+            <div class="text-sm text-gray-600 mt-1">Total Entries</div>
         </div>
         <div class="stat-card">
             <div class="text-2xl font-semibold text-gray-900">
@@ -65,20 +65,24 @@
                         <i class="fas fa-file text-white text-xl"></i>
                     {% endif %}
                 </div>
+                {% if log.file_type %}
                 <span class="badge text-xs">{{ log.file_type|slice:":15" }}</span>
+                {% endif %}
             </div>
             
             <!-- File Info -->
             <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900 mb-1 truncate" title="{{ log.file_name }}">
-                    {{ log.file_name|truncatewords:4 }}
+                <h3 class="text-sm font-semibold text-gray-900 mb-1 truncate" title="{{ log.title }}">
+                    {{ log.title|truncatewords:6 }}
                 </h3>
                 <p class="text-xs text-gray-600 mb-2">
                     <i class="far fa-calendar text-xs"></i> {{ log.date }}
                 </p>
-                <p class="text-xs text-gray-700 line-clamp-2" title="{{ log.title }}">
-                    {{ log.title }}
+                {% if log.file_name %}
+                <p class="text-xs text-gray-700 line-clamp-2" title="{{ log.file_name }}">
+                    {{ log.file_name }}
                 </p>
+                {% endif %}
             </div>
             
             <!-- Actions -->
@@ -87,10 +91,12 @@
                     <i class="fas fa-eye"></i>
                     <span>View</span>
                 </a>
+                {% if log.file_base64 %}
                 <a href="{% url 'download_file' log.record_id %}" class="flex-1 btn-primary text-center text-xs py-2">
                     <i class="fas fa-download"></i>
                     <span>Download</span>
                 </a>
+                {% endif %}
                 <a href="{% url 'edit_log' log.record_id %}" class="flex-1 btn-secondary text-center text-xs py-2">
                     <i class="fas fa-edit"></i>
                     <span>Edit</span>
@@ -105,8 +111,8 @@
         <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <i class="fas fa-magic text-gray-400 text-3xl"></i>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">No uploads yet</h3>
-        <p class="text-gray-600 mb-6">Start adding files to your learning entries to see them here.</p>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No entries yet</h3>
+        <p class="text-gray-600 mb-6">Start adding learning entries to see them here.</p>
         <a href="{% url 'create_log' %}" class="btn-primary">
             <i class="fas fa-plus"></i>
             <span>Create New Entry</span>

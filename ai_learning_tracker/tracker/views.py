@@ -130,11 +130,10 @@ def download_file(request, record_id):
 
 @login_required
 def my_magics(request):
-    """View all uploads/files for the current user"""
+    """View all learning entries for the current user"""
     logs_with_files = LearningLog.objects.filter(
-        user=request.user, 
-        file_base64__isnull=False
-    ).exclude(file_base64='').order_by('-date', '-created_at')
+        user=request.user
+    ).order_by('-date', '-created_at')
     
     context = {
         'logs_with_files': logs_with_files,
