@@ -1,0 +1,104 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in">
+    <div class="card p-8 mb-6">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                <i class="fas fa-crown text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">Admin Dashboard</h1>
+                <p class="text-sm text-gray-600">Manage users, logs, and system settings</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="stat-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-blue-600"></i>
+                </div>
+                <span class="text-xs text-gray-500 font-medium">USERS</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">{{ users|length }}</p>
+            <p class="text-sm text-gray-600 mt-1">Total users</p>
+        </div>
+        
+        <div class="stat-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-book text-purple-600"></i>
+                </div>
+                <span class="text-xs text-gray-500 font-medium">LOGS</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">{{ total_logs }}</p>
+            <p class="text-sm text-gray-600 mt-1">Learning entries</p>
+        </div>
+        
+        <div class="stat-card">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-quote-left text-green-600"></i>
+                </div>
+                <span class="text-xs text-gray-500 font-medium">QUOTES</span>
+            </div>
+            <p class="text-3xl font-bold text-gray-900">{{ total_quotes }}</p>
+            <p class="text-sm text-gray-600 mt-1">Motivational quotes</p>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="card p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'manage_quotes' %}" class="btn-primary">
+                <i class="fas fa-quote-left"></i>
+                <span>Manage Quotes</span>
+            </a>
+            <a href="{% url 'export_data_json' %}" class="btn-primary" style="background: #16a34a;">
+                <i class="fas fa-download"></i>
+                <span>Export All Data (JSON)</span>
+            </a>
+            <a href="/admin/" class="btn-secondary">
+                <i class="fas fa-cog"></i>
+                <span>Django Admin</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- User Statistics -->
+    <div class="card p-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">User Statistics</h2>
+        
+        <div class="space-y-3">
+            {% for user in user_stats %}
+            <div class="card p-5 flex items-center justify-between hover:shadow-md transition-all">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center font-semibold text-blue-600">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ user.username }}</p>
+                        <p class="text-xs text-gray-600">{{ user.log_count }} total entries</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xl font-bold text-gray-900">{{ user.log_count }}</p>
+                    <p class="text-xs text-gray-600">logs</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-8">
+                <p class="text-sm text-gray-600">No users found</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

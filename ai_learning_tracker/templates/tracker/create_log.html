@@ -1,0 +1,133 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Create Entry - AI Learning Tracker{% endblock %}
+{% block page_title %}Create Entry{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto fade-in">
+    <div class="card p-8">
+        <div class="flex items-center space-x-3 mb-8">
+            <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                <i class="fas fa-plus text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">New Learning Entry</h1>
+                <p class="text-sm text-gray-600">Document your learning progress</p>
+            </div>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-heading text-gray-600 mr-1"></i>
+                    Title *
+                </label>
+                {{ form.title }}
+                <p class="text-xs text-gray-500 mt-1">What did you learn today?</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-calendar text-gray-600 mr-1"></i>
+                    Date *
+                </label>
+                {{ form.date }}
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-file-alt text-gray-600 mr-1"></i>
+                    Notes *
+                </label>
+                {{ form.notes }}
+                <p class="text-xs text-gray-500 mt-1">Document your learning in detail</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-code text-gray-600 mr-1"></i>
+                    Code Snippet (Optional)
+                </label>
+                {{ form.code_snippet }}
+                <p class="text-xs text-gray-500 mt-1">Paste any code you worked on</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-tag text-gray-600 mr-1"></i>
+                    Code Language (Optional)
+                </label>
+                {{ form.code_language }}
+                <p class="text-xs text-gray-500 mt-1">Select the programming language for syntax highlighting</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-tags text-gray-600 mr-1"></i>
+                    Tags (Optional)
+                </label>
+                {{ form.tags }}
+                <p class="text-xs text-gray-500 mt-1">Comma-separated (e.g., python, machine-learning)</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-paperclip text-gray-600 mr-1"></i>
+                    Upload Document (Optional)
+                </label>
+                {{ form.file_upload }}
+                <p class="text-xs text-gray-500 mt-1">PDF, images, or any documentation</p>
+            </div>
+            
+            <div class="flex items-center space-x-3 pt-4 border-t border-gray-200">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    <span>Save Entry</span>
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn-secondary">
+                    <i class="fas fa-times"></i>
+                    <span>Cancel</span>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select,
+    input[type="file"] {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        background: #ffffff;
+        border: 1px solid #d4d4d8;
+        border-radius: 0.5rem;
+        color: #18181b;
+        font-size: 0.875rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #18181b;
+        box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.1);
+    }
+    
+    input[type="file"] {
+        padding: 0.5rem;
+    }
+</style>
+{% endblock %}

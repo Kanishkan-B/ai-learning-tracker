@@ -1,0 +1,97 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Manage Quotes - Admin{% endblock %}
+{% block page_title %}Manage Quotes{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in">
+    <div class="card p-8 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                    <i class="fas fa-quote-left text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-900">Manage Quotes</h1>
+                    <p class="text-sm text-gray-600">Manage motivational quotes</p>
+                </div>
+            </div>
+            <a href="{% url 'admin_dashboard' %}" class="btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Admin</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Add New Quote -->
+    <div class="card p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Add New Quote</h2>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Quote Text *</label>
+                    {{ form.text }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Author *</label>
+                    {{ form.author }}
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Add Quote</span>
+            </button>
+        </form>
+    </div>
+    
+    <!-- Existing Quotes -->
+    <div class="card p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Existing Quotes ({{ quotes|length }})</h2>
+        
+        {% if quotes %}
+        <div class="space-y-3">
+            {% for quote in quotes %}
+            <div class="card p-5 flex items-start justify-between hover:shadow-md transition-all">
+                <div class="flex-1">
+                    <p class="text-gray-900 font-normal mb-1 italic">"{{ quote.text }}"</p>
+                    <p class="text-sm text-gray-600">— {{ quote.author }}</p>
+                </div>
+                <form method="post" action="{% url 'delete_quote' quote.id %}" class="ml-4">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:text-red-700 text-sm" onclick="return confirm('Are you sure you want to delete this quote?')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-quote-left text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600">No quotes yet. Add one above!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    input[type="text"] {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        background: #ffffff;
+        border: 1px solid #d4d4d8;
+        border-radius: 0.5rem;
+        color: #18181b;
+        font-size: 0.875rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #18181b;
+        box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.1);
+    }
+</style>
+{% endblock %}

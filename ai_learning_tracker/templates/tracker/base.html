@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Learning Tracker{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-swift.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-r.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-matlab.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-powershell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup-templating.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; color: #18181b; }
+        .sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: #ffffff; border-right: 1px solid #e5e7eb; z-index: 40; transition: transform 0.3s; }
+        .sidebar-logo { padding: 1.5rem 1.25rem; border-bottom: 1px solid #e5e7eb; }
+        .sidebar-nav { padding: 1rem 0.75rem; }
+        .nav-item { display: flex; align-items: center; padding: 0.75rem 1rem; margin-bottom: 0.25rem; border-radius: 0.5rem; color: #52525b; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+        .nav-item:hover { background: #f4f4f5; color: #18181b; }
+        .nav-item.active { background: #f4f4f5; color: #18181b; font-weight: 600; }
+        .nav-item i { width: 20px; margin-right: 0.75rem; font-size: 0.875rem; }
+        .top-nav { position: fixed; top: 0; left: 260px; right: 0; height: 64px; background: #ffffff; border-bottom: 1px solid #e5e7eb; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; }
+        .main-content { margin-left: 260px; margin-top: 64px; padding: 2rem; min-height: calc(100vh - 64px); }
+        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); transition: all 0.2s; }
+        .card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-primary { background: #18181b; color: #ffffff; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        .btn-primary:hover { background: #27272a; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-secondary { background: #ffffff; color: #52525b; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        .btn-secondary:hover { background: #f4f4f5; }
+        .input { width: 100%; padding: 0.625rem 0.875rem; background: #ffffff; border: 1px solid #d4d4d8; border-radius: 0.5rem; color: #18181b; font-size: 0.875rem; transition: all 0.2s; }
+        .input:focus { outline: none; border-color: #18181b; box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.1); }
+        textarea.input { min-height: 120px; font-family: 'Inter', sans-serif; resize: vertical; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fafafa; }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+        pre[class*="language-"] { border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 0.875rem; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .top-nav { left: 0; }
+            .main-content { margin-left: 0; padding: 1rem; }
+        }
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 35; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+        .stat-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; transition: all 0.2s; }
+        .stat-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background: #f4f4f5; color: #52525b; border: 1px solid #e5e7eb; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; color: #52525b; }
+        .login-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- Sidebar for authenticated users -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <a href="{% url 'dashboard' %}" class="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+                <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <span>AI Tracker</span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-th-large"></i><span>Dashboard</span>
+            </a>
+            <a href="{% url 'create_log' %}" class="nav-item {% if request.resolver_match.url_name == 'create_log' %}active{% endif %}">
+                <i class="fas fa-plus"></i><span>Add New Entry</span>
+            </a>
+            <a href="{% url 'my_magics' %}" class="nav-item {% if request.resolver_match.url_name == 'my_magics' %}active{% endif %}">
+                <i class="fas fa-magic"></i><span>My Magics</span>
+            </a>
+            <a href="{% url 'search_logs' %}" class="nav-item {% if request.resolver_match.url_name == 'search_logs' %}active{% endif %}">
+                <i class="fas fa-search"></i><span>Search</span>
+            </a>
+            <div style="margin: 1rem 0; border-top: 1px solid #e5e7eb;"></div>
+            {% if user.is_superuser %}
+            <a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-crown"></i><span>Admin</span>
+            </a>
+            {% endif %}
+        </nav>
+    </aside>
+    
+    <!-- Top Nav for authenticated users -->
+    <header class="top-nav">
+        <div class="flex items-center">
+            <button class="md:hidden mr-4 p-2 text-gray-600 hover:text-gray-900" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="text-sm text-gray-600">
+                <span class="text-gray-900 font-medium">{% block page_title %}Dashboard{% endblock %}</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="p-2 text-gray-600 hover:text-gray-900 relative">
+                <i class="far fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center space-x-3 pl-4 border-l border-gray-200">
+                <div class="user-avatar">{{ user.username|slice:":1"|upper }}</div>
+                <div class="hidden sm:block">
+                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                    <div class="text-xs text-gray-500">{{ user.email|default:"User" }}</div>
+                </div>
+                <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-900 ml-2" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    
+    {% endif %}
+    
+    <!-- Content area for all users -->
+    {% if user.is_authenticated %}
+    <main class="main-content">
+    {% else %}
+    <div class="login-wrapper">
+    {% endif %}
+        {% if messages %}
+        <div class="mb-6 {% if not user.is_authenticated %}w-full max-w-md{% else %}space-y-2{% endif %}">
+            {% for message in messages %}
+            <div class="card p-4 bg-blue-50 border-blue-200 text-blue-800 flex items-center space-x-3">
+                <i class="fas fa-info-circle"></i><span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    {% if user.is_authenticated %}
+    </main>
+    {% else %}
+    </div>
+    {% endif %}
+    
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            }
+        }
+        
+        {% if user.is_authenticated %}
+        const quotes = [
+            {% if quotes %}{% for q in quotes %}{text: "{{ q.text|escapejs }}", author: "{{ q.author|escapejs }}"},{% endfor %}
+            {% else %}{text: "Keep learning, keep growing!", author: "Anonymous"},{text: "Every expert was once a beginner.", author: "Anonymous"}{% endif %}
+        ];
+        
+        let currentQuoteIndex = 0;
+        function rotateQuote() {
+            const quoteText = document.getElementById('quote-text');
+            const quoteAuthor = document.getElementById('quote-author');
+            if (quoteText && quoteAuthor && quotes.length > 0) {
+                currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+                quoteText.style.opacity = '0';
+                quoteAuthor.style.opacity = '0';
+                setTimeout(() => {
+                    quoteText.textContent = '"' + quotes[currentQuoteIndex].text + '"';
+                    quoteAuthor.textContent = '— ' + quotes[currentQuoteIndex].author;
+                    quoteText.style.opacity = '1';
+                    quoteAuthor.style.opacity = '1';
+                }, 300);
+            }
+        }
+        setInterval(rotateQuote, 10000);
+        {% endif %}
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

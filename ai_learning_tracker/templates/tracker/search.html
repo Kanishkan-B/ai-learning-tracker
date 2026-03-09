@@ -1,0 +1,93 @@
+{% extends 'tracker/base.html' %}
+{% load custom_filters %}
+
+{% block title %}Search - AI Learning Tracker{% endblock %}
+{% block page_title %}Search{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in">
+    <div class="card p-8 mb-6">
+        <div class="flex items-center space-x-3 mb-6">
+            <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                <i class="fas fa-search text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">Search Learning Logs</h1>
+                <p class="text-sm text-gray-600">Find entries by ID, title, tags, or keywords</p>
+            </div>
+        </div>
+        
+        <form method="get" class="mt-6">
+            <div class="flex space-x-3">
+                <div class="flex-1">
+                    <input type="text" 
+                           name="query" 
+                           value="{{ form.query.value|default:'' }}" 
+                           placeholder="Search by ID, title, tags, or keywords..."
+                           class="input text-base">
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    {% if results %}
+    <div class="card p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-gray-900">
+                Found {{ results|length }} result{{ results|length|pluralize }}
+            </h2>
+        </div>
+        
+        <div class="space-y-4">
+            {% for log in results %}
+            <a href="{% url 'view_log' log.record_id %}" 
+               class="block card p-5 hover:shadow-md transition-all duration-200 group">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-xs text-gray-500 font-mono">#{{ log.record_id }}</span>
+                            <span class="text-xs text-gray-400">•</span>
+                            <span class="text-xs text-gray-600">
+                                <i class="far fa-calendar text-xs"></i>
+                                {{ log.date }}
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2 group-hover:text-black">{{ log.title }}</h3>
+                        <p class="text-sm text-gray-600 mb-3">{{ log.notes|truncatewords:30 }}</p>
+                        {% if log.tags %}
+                        <div class="flex flex-wrap gap-2">
+                            {% with tags_list=log.tags|split:',' %}
+                                {% for tag in tags_list %}
+                                    {% if forloop.counter <= 5 %}
+                                    <span class="badge">{{ tag|trim }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 group-hover:text-gray-900 transition-colors ml-4"></i>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% elif request.GET.query %}
+    <div class="card p-12 text-center">
+        <i class="fas fa-search text-5xl text-gray-300 mb-4"></i>
+        <p class="text-lg text-gray-900 mb-2">No results found for "{{ request.GET.query }}"</p>
+        <p class="text-sm text-gray-600">Try different keywords or search by record ID</p>
+    </div>
+    {% else %}
+    <div class="card p-12 text-center">
+        <i class="fas fa-keyboard text-5xl text-gray-300 mb-4"></i>
+        <p class="text-lg text-gray-900 mb-2">Enter a search term to get started</p>
+        <p class="text-sm text-gray-600">Search across all your learning entries</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

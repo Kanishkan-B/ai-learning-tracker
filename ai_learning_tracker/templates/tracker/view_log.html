@@ -1,0 +1,122 @@
+{% extends 'tracker/base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ log.title }} - View Entry{% endblock %}
+{% block page_title %}View Entry{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto fade-in">
+    <a href="{% url 'dashboard' %}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6 group">
+        <i class="fas fa-arrow-left mr-2 text-xs transition-transform group-hover:-translate-x-1"></i>
+        <span>Back to Dashboard</span>
+    </a>
+    
+    <div class="card p-8">
+        <!-- Header -->
+        <div class="border-b border-gray-200 pb-6 mb-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="text-sm text-gray-500 font-mono">#{{ log.record_id }}</span>
+                        <span class="text-gray-400">•</span>
+                        <span class="text-sm text-gray-600">
+                            <i class="far fa-calendar text-xs"></i>
+                            {{ log.date }}
+                        </span>
+                    </div>
+                    <h1 class="text-2xl font-semibold text-gray-900">{{ log.title }}</h1>
+                </div>
+                <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                    <i class="fas fa-book-open text-white"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notes -->
+        <div class="mb-6">
+            <h2 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                <i class="fas fa-file-alt text-gray-600 mr-2"></i>
+                <span>Notes</span>
+            </h2>
+            <div class="card p-5 bg-gray-50 text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{{ log.notes }}</div>
+        </div>
+        
+        <!-- Code Snippet -->
+        {% if log.code_snippet %}
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-base font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-code text-gray-600 mr-2"></i>
+                    <span>Code Snippet</span>
+                </h2>
+                {% if log.code_language %}
+                <span class="badge bg-blue-50 text-blue-700 border-blue-200 flex items-center">
+                    <i class="fas fa-tag text-xs mr-1"></i>
+                    <span>{{ log.get_code_language_display }}</span>
+                </span>
+                {% endif %}
+            </div>
+            <div class="card overflow-hidden">
+                <pre class="language-{{ log.code_language|default:'python' }}"><code>{{ log.code_snippet }}</code></pre>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Tags -->
+        {% if log.tags %}
+        <div class="mb-6">
+            <h2 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                <i class="fas fa-tags text-gray-600 mr-2"></i>
+                <span>Tags</span>
+            </h2>
+            <div class="flex flex-wrap gap-2">
+                {% with tags_list=log.tags|split:',' %}
+                    {% for tag in tags_list %}
+                    <span class="badge cursor-default">{{ tag|trim }}</span>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Attached File -->
+        {% if log.file_base64 %}
+        <div class="mb-6">
+            <h2 class="text-base font-semibold text-gray-900 mb-3 flex items-center">
+                <i class="fas fa-paperclip text-gray-600 mr-2"></i>
+                <span>Attached Document</span>
+            </h2>
+            <div class="card p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file text-white"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ log.file_name }}</p>
+                        <p class="text-xs text-gray-600">{{ log.file_type }}</p>
+                    </div>
+                </div>
+                <a href="{% url 'download_file' log.record_id %}" class="btn-primary">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Metadata -->
+        <div class="card p-4 bg-gray-50 mt-6">
+            <div class="flex items-center justify-between text-xs text-gray-600">
+                <div class="flex items-center space-x-1">
+                    <i class="far fa-clock"></i>
+                    <span>Created: {{ log.date }}</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <i class="far fa-user"></i>
+                    <span>{{ user.username }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
