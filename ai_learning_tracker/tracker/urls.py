@@ -1,4 +1,4 @@
-﻿from django.urls import path
+from django.urls import path
 from . import views
 
 urlpatterns = [
@@ -7,6 +7,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('create/', views.create_log, name='create_log'),
     path('log/<str:record_id>/', views.view_log, name='view_log'),
+    path('log/<str:record_id>/edit/', views.edit_log, name='edit_log'),
     path('download/<str:record_id>/', views.download_file, name='download_file'),
     path('my-magics/', views.my_magics, name='my_magics'),
     path('search/', views.search_logs, name='search_logs'),

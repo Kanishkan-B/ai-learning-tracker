@@ -1,4 +1,4 @@
-﻿from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -92,6 +92,20 @@ def create_log(request):
         form = LearningLogForm(initial={'date': timezone.now().date()})
     
     return render(request, 'tracker/create_log.html', {'form': form})
+
+
+@login_required
+def edit_log(request, record_id):
+    log = get_object_or_404(LearningLog, record_id=record_id, user=request.user)
+    if request.method == 'POST':
+        form = LearningLogForm(request.POST, request.FILES, instance=log)
+        if form.is_valid():
+            form.save()
+            return redirect('my_magics')
+    else:
+        form = LearningLogForm(instance=log)
+    
+    return render(request, 'tracker/edit_log.html', {'form': form, 'log': log})
 
 @login_required
 def view_log(request, record_id):
