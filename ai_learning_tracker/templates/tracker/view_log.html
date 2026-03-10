@@ -96,10 +96,17 @@
                         <p class="text-xs text-gray-600">{{ log.file_type }}</p>
                     </div>
                 </div>
+                {% if user == log.user %}
                 <a href="{% url 'download_file' log.record_id %}" class="btn-primary">
                     <i class="fas fa-download"></i>
                     <span>Download</span>
                 </a>
+                {% else %}
+                <a href="{% url 'download_file_public' log.record_id %}" class="btn-primary">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                </a>
+                {% endif %}
             </div>
         </div>
         {% endif %}

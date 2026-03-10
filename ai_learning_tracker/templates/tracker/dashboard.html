@@ -141,9 +141,11 @@
                         {{ forloop.counter }}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">
-                            {{ user.user.get_full_name|default:user.user.username }}
-                        </p>
+                        <a href="{% url 'user_entries' user.user.username %}" class="block">
+                            <p class="text-sm font-medium text-gray-900 truncate hover:underline">
+                                {{ user.user.get_full_name|default:user.user.username }}
+                            </p>
+                        </a>
                         <p class="text-xs text-gray-600">{{ user.total_logs }} entries</p>
                     </div>
                     <div class="flex-shrink-0">

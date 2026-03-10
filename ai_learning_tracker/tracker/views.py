@@ -15,6 +15,10 @@ def is_admin(user):
     return user.is_superuser
 
 def login_view(request):
+    # If already logged in, go straight to dashboard
+    if request.user.is_authenticated and request.method == 'GET':
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -134,12 +138,52 @@ def my_magics(request):
     logs_with_files = LearningLog.objects.filter(
         user=request.user
     ).order_by('-date', '-created_at')
+    attachments_count = logs_with_files.exclude(file_base64__isnull=True).exclude(file_base64='').count()
     
     context = {
         'logs_with_files': logs_with_files,
+        'attachments_count': attachments_count,
     }
     
     return render(request, 'tracker/my_magics.html', context)
+
+
+@login_required
+def user_entries(request, username):
+    """Read-only view of another user's learning entries"""
+    target_user = get_object_or_404(User, username=username)
+    logs = LearningLog.objects.filter(
+        user=target_user
+    ).order_by('-date', '-created_at')
+    attachments_count = logs.exclude(file_base64__isnull=True).exclude(file_base64='').count()
+    
+    context = {
+        'target_user': target_user,
+        'logs': logs,
+        'attachments_count': attachments_count,
+    }
+    return render(request, 'tracker/user_entries.html', context)
+
+
+@login_required
+def view_log_public(request, record_id):
+    """View any user's log in read-only mode (used from shared views)"""
+    log = get_object_or_404(LearningLog, record_id=record_id)
+    return render(request, 'tracker/view_log.html', {'log': log})
+
+
+@login_required
+def download_file_public(request, record_id):
+    """Download any user's attachment (used from shared views)"""
+    log = get_object_or_404(LearningLog, record_id=record_id)
+    
+    if not log.file_base64:
+        return HttpResponse('No file attached', status=404)
+    
+    file_data = base64.b64decode(log.file_base64)
+    response = HttpResponse(file_data, content_type=log.file_type)
+    response['Content-Disposition'] = f'attachment; filename="{log.file_name}"'
+    return response
 
 @login_required
 def search_logs(request):
