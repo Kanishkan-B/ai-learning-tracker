@@ -8,8 +8,8 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import base64
 import json
-from .models import LearningLog, UserProfile, MotivationalQuote, LearningActivity
-from .forms import LearningLogForm, SearchForm
+from .models import LearningLog, UserProfile, MotivationalQuote, LearningActivity, Effort
+from .forms import LearningLogForm, SearchForm, EffortForm, CompleteEffortForm
 
 def is_admin(user):
     return user.is_superuser
@@ -146,6 +146,45 @@ def my_magics(request):
     }
     
     return render(request, 'tracker/my_magics.html', context)
+
+
+@login_required
+def my_efforts(request):
+    """List user's learning efforts."""
+    efforts = Effort.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'tracker/my_efforts.html', {'efforts': efforts})
+
+
+@login_required
+def create_effort(request):
+    """Create a new effort."""
+    if request.method == 'POST':
+        form = EffortForm(request.POST)
+        if form.is_valid():
+            effort = form.save(commit=False)
+            effort.user = request.user
+            effort.save()
+            return redirect('my_efforts')
+    else:
+        form = EffortForm(initial={
+            'start_date': timezone.now().date(),
+            'end_date': timezone.now().date() + timedelta(days=7),
+        })
+    return render(request, 'tracker/create_effort.html', {'form': form})
+
+
+@login_required
+def complete_effort(request, pk):
+    """Mark effort as completed with comments and approval (POST from modal)."""
+    effort = get_object_or_404(Effort, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = CompleteEffortForm(request.POST, instance=effort)
+        if form.is_valid():
+            effort = form.save(commit=False)
+            effort.status = 'completed'
+            effort.save()
+            return redirect('my_efforts')
+    return redirect('my_efforts')
 
 
 @login_required

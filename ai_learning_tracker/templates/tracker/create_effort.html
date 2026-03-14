@@ -1,0 +1,87 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}New Effort - AI Learning Tracker{% endblock %}
+{% block page_title %}New Effort{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto fade-in">
+    <div class="card p-8">
+        <div class="flex items-center space-x-3 mb-8">
+            <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                <i class="fas fa-bullseye text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">New Learning Effort</h1>
+                <p class="text-sm text-gray-600">Set a start and end date to track your progress</p>
+            </div>
+        </div>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-book text-gray-600 mr-1"></i>
+                    Learning topic or task *
+                </label>
+                {{ form.learning_topic }}
+                {% if form.learning_topic.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ form.learning_topic.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">
+                        <i class="fas fa-calendar-plus text-gray-600 mr-1"></i>
+                        Start date *
+                    </label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                    <p class="text-xs text-red-600 mt-1">{{ form.start_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">
+                        <i class="fas fa-calendar-check text-gray-600 mr-1"></i>
+                        End date *
+                    </label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}
+                    <p class="text-xs text-red-600 mt-1">{{ form.end_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% if form.non_field_errors %}
+            <div class="text-sm text-red-600">{{ form.non_field_errors.0 }}</div>
+            {% endif %}
+            
+            <div class="flex items-center space-x-3 pt-4 border-t border-gray-200">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-play"></i>
+                    <span>Start Effort</span>
+                </button>
+                <a href="{% url 'my_efforts' %}" class="btn-secondary">
+                    <i class="fas fa-times"></i>
+                    <span>Cancel</span>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"],
+    input[type="date"] {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        background: #ffffff;
+        border: 1px solid #d4d4d8;
+        border-radius: 0.5rem;
+        color: #18181b;
+        font-size: 0.875rem;
+        font-family: 'Inter', sans-serif;
+    }
+    input:focus { outline: none; border-color: #18181b; box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.1); }
+</style>
+{% endblock %}

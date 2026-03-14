@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -97,6 +97,9 @@
             </a>
             <a href="{% url 'my_magics' %}" class="nav-item {% if request.resolver_match.url_name == 'my_magics' %}active{% endif %}">
                 <i class="fas fa-magic"></i><span>My Magics</span>
+            </a>
+            <a href="{% url 'my_efforts' %}" class="nav-item {% if request.resolver_match.url_name == 'my_efforts' %}active{% endif %}">
+                <i class="fas fa-bullseye"></i><span>My Efforts</span>
             </a>
             <a href="{% url 'search_logs' %}" class="nav-item {% if request.resolver_match.url_name == 'search_logs' %}active{% endif %}">
                 <i class="fas fa-search"></i><span>Search</span>

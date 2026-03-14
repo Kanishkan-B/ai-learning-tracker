@@ -1,0 +1,243 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}My Efforts - AI Learning Tracker{% endblock %}
+{% block page_title %}My Efforts{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in">
+    <!-- Header -->
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                <i class="fas fa-bullseye text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">My Efforts</h1>
+                <p class="text-sm text-gray-600">Track learning efforts between start and end date</p>
+            </div>
+        </div>
+        <a href="{% url 'create_effort' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            <span>New Effort</span>
+        </a>
+    </div>
+    
+    {% if efforts %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for effort in efforts %}
+        <div class="card p-6 hover:shadow-lg transition-all effort-card" data-effort-id="{{ effort.pk }}">
+            <div class="flex items-start justify-between mb-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book-open text-white text-xl"></i>
+                </div>
+                {% if effort.status == 'completed' %}
+                <span class="badge bg-green-100 text-green-800 border-green-200">Completed</span>
+                {% else %}
+                <span class="badge bg-blue-100 text-blue-800 border-blue-200">In Progress</span>
+                {% endif %}
+            </div>
+            
+            <h3 class="text-base font-semibold text-gray-900 mb-2 line-clamp-2" title="{{ effort.learning_topic }}">
+                {{ effort.learning_topic }}
+            </h3>
+            <p class="text-xs text-gray-600 mb-3">
+                <i class="far fa-calendar mr-1"></i>
+                {{ effort.start_date|date:"M d, Y" }} → {{ effort.end_date|date:"M d, Y" }}
+            </p>
+            
+            <!-- Progress bar -->
+            <div class="mb-4">
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>Progress</span>
+                    <span class="effort-pct" data-start="{{ effort.start_date.isoformat }}" data-end="{{ effort.end_date.isoformat }}" data-status="{{ effort.status }}">
+                        —%
+                    </span>
+                </div>
+                <div class="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="effort-bar h-full rounded-full transition-all duration-700 ease-out" style="width: 0%; background: #3b82f6;"></div>
+                </div>
+            </div>
+            
+            <p class="text-xs text-gray-500 mb-4 effort-days" data-start="{{ effort.start_date.isoformat }}" data-end="{{ effort.end_date.isoformat }}" data-status="{{ effort.status }}">
+                <i class="far fa-clock mr-1"></i>
+                <span class="effort-days-text">— days remaining</span>
+            </p>
+            
+            {% if effort.status == 'completed' and effort.comments %}
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="text-xs font-medium text-gray-700 mb-1">What I learned</p>
+                <p class="text-xs text-gray-600 whitespace-pre-wrap">{{ effort.comments }}</p>
+                {% if effort.approved %}
+                <p class="text-xs text-green-600 mt-2"><i class="fas fa-check-circle mr-1"></i>Approved</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if effort.status == 'in_progress' %}
+            <div class="pt-3 border-t border-gray-200">
+                <button type="button" class="btn-primary w-full justify-center text-sm py-2 effort-done-btn" data-effort-id="{{ effort.pk }}">
+                    <i class="fas fa-check"></i>
+                    <span>Done</span>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty state -->
+    <div class="card p-12 text-center">
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-bullseye text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No efforts yet</h3>
+        <p class="text-gray-600 mb-6">Create a learning effort with a start and end date to track your progress.</p>
+        <a href="{% url 'create_effort' %}" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            <span>New Effort</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Complete effort -->
+<div id="complete-effort-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-hidden="true">
+    <div class="fixed inset-0 bg-black/50 transition-opacity" id="modal-backdrop"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative card p-6 max-w-md w-full shadow-xl fade-in" id="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Mark as Done</h3>
+                <button type="button" class="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form method="post" action="" id="complete-effort-form">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Comments (what you learned)</label>
+                    <textarea name="comments" id="id_comments" class="input" rows="4" placeholder="Key takeaways, what you learned..."></textarea>
+                </div>
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" name="approved" id="id_approved" class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900">
+                    <label for="id_approved" class="ml-2 text-sm text-gray-700">Mark as approved</label>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="submit" class="btn-primary flex-1 justify-center">
+                        <i class="fas fa-check"></i>
+                        <span>Submit</span>
+                    </button>
+                    <button type="button" class="btn-secondary flex-1 justify-center" id="modal-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .effort-bar { min-width: 4px; }
+</style>
+
+<script>
+(function() {
+    function parseDate(str) {
+        var parts = str.split('-');
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+    
+    function getProgress(startStr, endStr, status) {
+        if (status === 'completed') return 100;
+        var start = parseDate(startStr);
+        var end = parseDate(endStr);
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+        if (today <= start) return 0;
+        if (today >= end) return 100;
+        var total = (end - start) / (24 * 60 * 60 * 1000);
+        var elapsed = (today - start) / (24 * 60 * 60 * 1000);
+        return Math.min(100, Math.round((elapsed / total) * 1000) / 10);
+    }
+    
+    function getDaysRemaining(startStr, endStr, status) {
+        var end = parseDate(endStr);
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        end.setHours(0, 0, 0, 0);
+        var diff = Math.ceil((end - today) / (24 * 60 * 60 * 1000));
+        if (status === 'completed') return 0;
+        return diff;
+    }
+    
+    function progressColor(pct) {
+        if (pct >= 100) return '#22c55e';  // green
+        if (pct >= 66) return '#ef4444';   // red
+        if (pct >= 33) return '#f97316';    // orange
+        return '#3b82f6';                    // blue
+    }
+    
+    function updateEffortCards() {
+        document.querySelectorAll('.effort-card').forEach(function(card) {
+            var pctEl = card.querySelector('.effort-pct');
+            var barEl = card.querySelector('.effort-bar');
+            var daysEl = card.querySelector('.effort-days-text');
+            var daysWrap = card.querySelector('.effort-days');
+            if (!pctEl || !barEl) return;
+            var startStr = pctEl.getAttribute('data-start');
+            var endStr = pctEl.getAttribute('data-end');
+            var status = pctEl.getAttribute('data-status') || 'in_progress';
+            var pct = getProgress(startStr, endStr, status);
+            var days = getDaysRemaining(startStr, endStr, status);
+            
+            pctEl.textContent = pct + '%';
+            barEl.style.width = pct + '%';
+            barEl.style.background = progressColor(pct);
+            
+            if (daysWrap && daysEl) {
+                if (status === 'completed')
+                    daysEl.textContent = 'Completed';
+                else if (days < 0)
+                    daysEl.textContent = Math.abs(days) + ' days overdue';
+                else if (days === 0)
+                    daysEl.textContent = 'Due today';
+                else
+                    daysEl.textContent = days + ' day' + (days !== 1 ? 's' : '') + ' remaining';
+            }
+        });
+    }
+    
+    updateEffortCards();
+    setInterval(updateEffortCards, 60000);
+    
+    var modal = document.getElementById('complete-effort-modal');
+    var form = document.getElementById('complete-effort-form');
+    var completeBase = '{% url "my_efforts" %}'.replace(/\/?$/, '');
+    
+    document.querySelectorAll('.effort-done-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = this.getAttribute('data-effort-id');
+            form.action = completeBase + '/' + id + '/complete/';
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+    
+    function closeModal() {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-backdrop').addEventListener('click', closeModal);
+    
+})();
+</script>
+{% endblock %}

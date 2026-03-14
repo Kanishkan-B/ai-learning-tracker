@@ -1,4 +1,4 @@
-﻿from django.db import models
+from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 import random
@@ -111,3 +111,46 @@ class LearningActivity(models.Model):
     
     def __str__(self):
         return f'{self.user.username} - {self.date} - {self.count} logs'
+
+
+class Effort(models.Model):
+    STATUS_CHOICES = [
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='efforts')
+    learning_topic = models.CharField(max_length=200)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
+    comments = models.TextField(blank=True)
+    approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f'{self.learning_topic} ({self.start_date} - {self.end_date})'
+    
+    def get_progress_percentage(self):
+        """Progress = (today - start) / (end - start), capped at 100 if completed."""
+        from django.utils import timezone
+        today = timezone.now().date()
+        if self.status == 'completed':
+            return 100
+        if today <= self.start_date:
+            return 0
+        if today >= self.end_date:
+            return 100
+        total_days = (self.end_date - self.start_date).days
+        if total_days <= 0:
+            return 100
+        elapsed = (today - self.start_date).days
+        return min(100, round(100 * elapsed / total_days, 1))
+    
+    def days_remaining(self):
+        """Days until end_date (negative if past)."""
+        from django.utils import timezone
+        today = timezone.now().date()
+        return (self.end_date - today).days

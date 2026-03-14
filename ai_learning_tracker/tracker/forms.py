@@ -1,5 +1,5 @@
-﻿from django import forms
-from .models import LearningLog
+from django import forms
+from .models import LearningLog, Effort
 import base64
 
 class LearningLogForm(forms.ModelForm):
@@ -42,3 +42,38 @@ class SearchForm(forms.Form):
             'placeholder': 'Search by ID, title, tags, or keywords...'
         })
     )
+
+
+class EffortForm(forms.ModelForm):
+    class Meta:
+        model = Effort
+        fields = ['learning_topic', 'start_date', 'end_date']
+        widgets = {
+            'learning_topic': forms.TextInput(attrs={
+                'class': 'input',
+                'placeholder': 'e.g. Django REST API, Machine Learning basics',
+            }),
+            'start_date': forms.DateInput(attrs={'class': 'input', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'input', 'type': 'date'}),
+        }
+    
+    def clean(self):
+        data = super().clean()
+        start = data.get('start_date')
+        end = data.get('end_date')
+        if start and end and end < start:
+            raise forms.ValidationError('End date must be on or after start date.')
+        return data
+
+
+class CompleteEffortForm(forms.ModelForm):
+    class Meta:
+        model = Effort
+        fields = ['comments', 'approved']
+        widgets = {
+            'comments': forms.Textarea(attrs={
+                'class': 'input',
+                'rows': 4,
+                'placeholder': 'What did you learn? Key takeaways...',
+            }),
+        }
