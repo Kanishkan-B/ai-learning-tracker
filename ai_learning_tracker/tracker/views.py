@@ -242,13 +242,19 @@ def search_logs(request):
     if form.is_valid():
         query = form.cleaned_data.get('query')
         if query:
-            results = LearningLog.objects.filter(
+            # Search by record_id across ALL users (so you can find friends' logs)
+            id_results = LearningLog.objects.filter(
+                Q(record_id__icontains=query)
+            )
+            # Search by title/tags/notes only in current user's logs
+            own_results = LearningLog.objects.filter(
                 Q(user=request.user),
-                Q(record_id__icontains=query) |
                 Q(title__icontains=query) |
                 Q(tags__icontains=query) |
                 Q(notes__icontains=query)
             )
+            # Combine and deduplicate
+            results = (id_results | own_results).distinct()
     
     return render(request, 'tracker/search.html', {'form': form, 'results': results})
 

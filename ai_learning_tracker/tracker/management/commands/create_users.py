@@ -22,7 +22,7 @@ class Command(BaseCommand):
         
         # Create Velmurugan
         if not User.objects.filter(username='velmurugan').exists():
-            User.objects.create_user('velmurugan', 'velmurugan@example.com', 'Velmurugan@2004')
-            self.stdout.write(self.style.SUCCESS('Created user_2 (username: velmurugan, password: Velmurugan@2004)'))
+            User.objects.create_user('velmurugan', 'velmurugan@example.com', 'Velmurugan@2003')
+            self.stdout.write(self.style.SUCCESS('Created user_2 (username: velmurugan, password: Velmurugan@2003)'))
         
         self.stdout.write(self.style.SUCCESS('All users created successfully!'))
