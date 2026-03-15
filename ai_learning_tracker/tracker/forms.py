@@ -1,5 +1,5 @@
 from django import forms
-from .models import LearningLog, Effort
+from .models import LearningLog, Effort, MotivationalQuote
 import base64
 
 class LearningLogForm(forms.ModelForm):
@@ -75,5 +75,23 @@ class CompleteEffortForm(forms.ModelForm):
                 'class': 'input',
                 'rows': 4,
                 'placeholder': 'What did you learn? Key takeaways...',
+            }),
+        }
+
+
+class MotivationalQuoteForm(forms.ModelForm):
+    class Meta:
+        model = MotivationalQuote
+        fields = ['text', 'author']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': 'input',
+                'rows': 3,
+                'placeholder': 'Enter motivational quote...',
+                'required': True,
+            }),
+            'author': forms.TextInput(attrs={
+                'class': 'input',
+                'placeholder': 'Author name (optional)',
             }),
         }

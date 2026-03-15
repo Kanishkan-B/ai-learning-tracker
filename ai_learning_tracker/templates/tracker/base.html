@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AI Learning Tracker{% endblock %}</title>
+    <title>{% block title %}My Learning Tracker{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -85,7 +85,7 @@
                 <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
                     <i class="fas fa-brain text-white text-sm"></i>
                 </div>
-                <span>AI Tracker</span>
+                <span>My Tracker</span>
             </a>
         </div>
         <nav class="sidebar-nav">
@@ -176,31 +176,6 @@
                 overlay.classList.toggle('active');
             }
         }
-        
-        {% if user.is_authenticated %}
-        const quotes = [
-            {% if quotes %}{% for q in quotes %}{text: "{{ q.text|escapejs }}", author: "{{ q.author|escapejs }}"},{% endfor %}
-            {% else %}{text: "Keep learning, keep growing!", author: "Anonymous"},{text: "Every expert was once a beginner.", author: "Anonymous"}{% endif %}
-        ];
-        
-        let currentQuoteIndex = 0;
-        function rotateQuote() {
-            const quoteText = document.getElementById('quote-text');
-            const quoteAuthor = document.getElementById('quote-author');
-            if (quoteText && quoteAuthor && quotes.length > 0) {
-                currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-                quoteText.style.opacity = '0';
-                quoteAuthor.style.opacity = '0';
-                setTimeout(() => {
-                    quoteText.textContent = '"' + quotes[currentQuoteIndex].text + '"';
-                    quoteAuthor.textContent = '— ' + quotes[currentQuoteIndex].author;
-                    quoteText.style.opacity = '1';
-                    quoteAuthor.style.opacity = '1';
-                }, 300);
-            }
-        }
-        setInterval(rotateQuote, 10000);
-        {% endif %}
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>

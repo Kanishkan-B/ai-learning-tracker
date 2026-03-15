@@ -1,6 +1,6 @@
 {% extends 'tracker/base.html' %}
 
-{% block title %}My Efforts - AI Learning Tracker{% endblock %}
+{% block title %}My Efforts - My Learning Tracker{% endblock %}
 {% block page_title %}My Efforts{% endblock %}
 
 {% block content %}
@@ -155,15 +155,14 @@
         if (status === 'completed') return 100;
         var start = parseDate(startStr);
         var end = parseDate(endStr);
-        var today = new Date();
-        today.setHours(0, 0, 0, 0);
+        var now = new Date();
         start.setHours(0, 0, 0, 0);
-        end.setHours(0, 0, 0, 0);
-        if (today <= start) return 0;
-        if (today >= end) return 100;
-        var total = (end - start) / (24 * 60 * 60 * 1000);
-        var elapsed = (today - start) / (24 * 60 * 60 * 1000);
-        return Math.min(100, Math.round((elapsed / total) * 1000) / 10);
+        end.setHours(23, 59, 59, 999);
+        if (now <= start) return 0;
+        if (now >= end) return 100;
+        var total = end - start;
+        var elapsed = now - start;
+        return Math.min(100, Math.round((elapsed / total) * 10000) / 100);
     }
     
     function getDaysRemaining(startStr, endStr, status) {
@@ -214,7 +213,7 @@
     }
     
     updateEffortCards();
-    setInterval(updateEffortCards, 60000);
+    setInterval(updateEffortCards, 1000);
     
     var modal = document.getElementById('complete-effort-modal');
     var form = document.getElementById('complete-effort-form');

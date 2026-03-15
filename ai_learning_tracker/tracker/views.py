@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import base64
 import json
 from .models import LearningLog, UserProfile, MotivationalQuote, LearningActivity, Effort
-from .forms import LearningLogForm, SearchForm, EffortForm, CompleteEffortForm
+from .forms import LearningLogForm, SearchForm, EffortForm, CompleteEffortForm, MotivationalQuoteForm
 
 def is_admin(user):
     return user.is_superuser
@@ -56,11 +56,21 @@ def dashboard(request):
     # Convert to dict for easy JavaScript access
     activity_map = {str(a['date']): a['count'] for a in activities}
     
-    # Get random quote
+    # Get next quote in sequence
     quotes_count = MotivationalQuote.objects.count()
     quote = None
     if quotes_count > 0:
-        quote = MotivationalQuote.objects.all()[0]
+        # Get current position from session, default to 0
+        current_position = request.session.get('quote_position', 0)
+        
+        # Get all quotes ordered by ID for consistency
+        quotes = list(MotivationalQuote.objects.all().order_by('id'))
+        
+        # Get the quote at current position
+        quote = quotes[current_position % quotes_count]
+        
+        # Update position for next request
+        request.session['quote_position'] = (current_position + 1) % quotes_count
     
     context = {
         'profile': profile,
@@ -244,12 +254,21 @@ def search_logs(request):
 
 @login_required
 def get_random_quote(request):
-    """API endpoint for getting random quote"""
+    """API endpoint for getting next quote in sequence"""
     quotes_count = MotivationalQuote.objects.count()
     if quotes_count > 0:
-        import random
-        random_index = random.randint(0, quotes_count - 1)
-        quote = MotivationalQuote.objects.all()[random_index]
+        # Get current position from session, default to 0
+        current_position = request.session.get('quote_position', 0)
+        
+        # Get all quotes ordered by ID for consistency
+        quotes = list(MotivationalQuote.objects.all().order_by('id'))
+        
+        # Get the quote at current position
+        quote = quotes[current_position % quotes_count]
+        
+        # Update position for next request (cycle through all quotes)
+        request.session['quote_position'] = (current_position + 1) % quotes_count
+        
         return JsonResponse({
             'text': quote.text,
             'author': quote.author
@@ -277,14 +296,15 @@ def admin_dashboard(request):
 @user_passes_test(is_admin)
 def manage_quotes(request):
     if request.method == 'POST':
-        text = request.POST.get('text')
-        author = request.POST.get('author', '')
-        if text:
-            MotivationalQuote.objects.create(text=text, author=author)
+        form = MotivationalQuoteForm(request.POST)
+        if form.is_valid():
+            form.save()
             return redirect('manage_quotes')
+    else:
+        form = MotivationalQuoteForm()
     
     quotes = MotivationalQuote.objects.all().order_by('-created_at')
-    return render(request, 'tracker/manage_quotes.html', {'quotes': quotes})
+    return render(request, 'tracker/manage_quotes.html', {'quotes': quotes, 'form': form})
 
 @user_passes_test(is_admin)
 def delete_quote(request, quote_id):

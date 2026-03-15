@@ -28,15 +28,13 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Add New Quote</h2>
         <form method="post" class="space-y-4">
             {% csrf_token %}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Quote Text *</label>
-                    {{ form.text }}
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Author *</label>
-                    {{ form.author }}
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">Quote Text *</label>
+                {{ form.text }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">Author</label>
+                {{ form.author }}
             </div>
             <button type="submit" class="btn-primary">
                 <i class="fas fa-plus"></i>

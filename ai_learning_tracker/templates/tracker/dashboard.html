@@ -1,7 +1,7 @@
 {% extends 'tracker/base.html' %}
 {% load custom_filters %}
 
-{% block title %}Dashboard - AI Learning Tracker{% endblock %}
+{% block title %}Dashboard - My Learning Tracker{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
@@ -164,4 +164,34 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Auto-rotate quotes every 4 seconds (sequential order)
+    function fetchRandomQuote() {
+        fetch("{% url 'get_random_quote' %}")
+            .then(response => response.json())
+            .then(data => {
+                const quoteText = document.getElementById('quote-text');
+                const quoteAuthor = document.getElementById('quote-author');
+                
+                // Fade out
+                quoteText.style.opacity = '0';
+                quoteAuthor.style.opacity = '0';
+                
+                // Update content after fade out
+                setTimeout(() => {
+                    quoteText.textContent = '"' + data.text + '"';
+                    quoteAuthor.textContent = '— ' + (data.author || 'Anonymous');
+                    
+                    // Fade in
+                    quoteText.style.opacity = '1';
+                    quoteAuthor.style.opacity = '1';
+                }, 300);
+            })
+            .catch(error => console.log('Quote fetch error:', error));
+    }
+    
+    // Start auto-rotation after 4 seconds, then repeat every 4 seconds
+    setInterval(fetchRandomQuote, 4000);
+</script>
 {% endblock %}
