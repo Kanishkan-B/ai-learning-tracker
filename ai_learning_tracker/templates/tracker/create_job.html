@@ -1,0 +1,177 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Add Jobs - My Learning Tracker{% endblock %}
+{% block page_title %}Add Jobs{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in">
+    <div class="card p-8">
+        <div class="flex items-center space-x-3 mb-8">
+            <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                <i class="fas fa-briefcase text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">Add Job Applications</h1>
+                <p class="text-sm text-gray-600">Add multiple job applications for a specific date</p>
+            </div>
+        </div>
+        
+        <form method="post" id="jobForm" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if error %}
+            <div class="card p-4 bg-red-50 border-red-200 text-red-800 flex items-center space-x-3 mb-4">
+                <i class="fas fa-exclamation-circle"></i><span>{{ error }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Date Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">
+                    <i class="fas fa-calendar text-gray-600 mr-1"></i>
+                    Application Date *
+                </label>
+                <input type="date" name="date" id="dateInput" class="input" value="{% if date %}{{ date }}{% endif %}" required>
+                <p class="text-xs text-gray-600 mt-1">Select the date when you applied/will apply for these jobs</p>
+            </div>
+            
+            <div class="border-t border-gray-200 pt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Job Applications</h2>
+                    <span class="text-sm text-gray-600">Add up to 20 jobs</span>
+                </div>
+                
+                <!-- Job Entries Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full mb-4" id="jobsTable">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-3 px-2 text-sm font-semibold text-gray-700" style="width: 30%;">Organization *</th>
+                                <th class="text-left py-3 px-2 text-sm font-semibold text-gray-700" style="width: 25%;">Role *</th>
+                                <th class="text-left py-3 px-2 text-sm font-semibold text-gray-700" style="width: 15%;">Status *</th>
+                                <th class="text-left py-3 px-2 text-sm font-semibold text-gray-700" style="width: 28%;">Job Link *</th>
+                                <th class="text-center py-3 px-2 text-sm font-semibold text-gray-700" style="width: 2%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobsTableBody">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button type="button" id="addRowBtn" class="btn-secondary text-sm">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Job</span>
+                </button>
+            </div>
+            
+            <div class="flex items-center space-x-3 pt-4 border-t border-gray-200">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    <span>Save All Jobs</span>
+                </button>
+                <a href="{% url 'my_jobs' %}" class="btn-secondary">
+                    <i class="fas fa-times"></i>
+                    <span>Cancel</span>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"],
+    input[type="url"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 0.5rem 0.625rem;
+        background: #ffffff;
+        border: 1px solid #d4d4d8;
+        border-radius: 0.375rem;
+        color: #18181b;
+        font-size: 0.875rem;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    input:focus, select:focus { 
+        outline: none; 
+        border-color: #18181b; 
+        box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.1); 
+    }
+    
+    table {
+        border-collapse: collapse;
+    }
+    #jobsTable input,
+    #jobsTable select {
+        font-size: 0.8125rem;
+        padding: 0.4rem 0.5rem;
+    }
+    .delete-row-btn {
+        color: #dc2626;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    .delete-row-btn:hover {
+        color: #991b1b;
+    }
+</style>
+
+<script>
+let rowCount = 0;
+const maxRows = 20;
+
+function addJobRow() {
+    if (rowCount >= maxRows) {
+        alert('Maximum 20 job entries allowed');
+        return;
+    }
+    
+    const tbody = document.getElementById('jobsTableBody');
+    const row = document.createElement('tr');
+    row.className = 'border-b border-gray-100 hover:bg-gray-50';
+    row.innerHTML = `
+        <td class="py-2 px-2">
+            <input type="text" name="organization_${rowCount}" placeholder="e.g. Google, Microsoft" required>
+        </td>
+        <td class="py-2 px-2">
+            <input type="text" name="role_${rowCount}" placeholder="e.g. Software Engineer" required>
+        </td>
+        <td class="py-2 px-2">
+            <select name="status_${rowCount}" required>
+                <option value="applied">Applied</option>
+                <option value="in_progress">In Progress</option>
+                <option value="awaiting_response">Awaiting Response</option>
+                <option value="rejected">Rejected</option>
+            </select>
+        </td>
+        <td class="py-2 px-2">
+            <input type="url" name="job_link_${rowCount}" placeholder="https://company.com/careers/job-id" required>
+        </td>
+        <td class="py-2 px-2 text-center">
+            <button type="button" class="delete-row-btn" onclick="deleteRow(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(row);
+    rowCount++;
+}
+
+function deleteRow(btn) {
+    const row = btn.closest('tr');
+    row.remove();
+    rowCount--;
+}
+
+// Add initial row
+document.addEventListener('DOMContentLoaded', function() {
+    addJobRow();
+});
+
+// Add row button handler
+document.getElementById('addRowBtn').addEventListener('click', addJobRow);
+</script>
+{% endblock %}

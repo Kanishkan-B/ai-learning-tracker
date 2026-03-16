@@ -23,8 +23,8 @@
         <!-- Streak Card -->
         <div class="stat-card">
             <div class="flex items-start justify-between mb-4">
-                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-fire text-orange-600"></i>
+                <div class="w-10 h-10 bg-orange-400 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-fire text-white"></i>
                 </div>
                 <span class="text-xs text-gray-500 font-medium">STREAK</span>
             </div>
@@ -136,20 +136,20 @@
             </div>
             <div class="space-y-3">
                 {% for user in leaderboard %}
-                <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group">
                     <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-semibold text-sm">
                         {{ forloop.counter }}
                     </div>
                     <div class="flex-1 min-w-0">
                         <a href="{% url 'user_entries' user.user.username %}" class="block">
-                            <p class="text-sm font-medium text-gray-900 truncate hover:underline">
+                            <p class="text-sm font-medium text-gray-900 truncate hover:text-blue-600">
                                 {{ user.user.get_full_name|default:user.user.username }}
                             </p>
                         </a>
                         <p class="text-xs text-gray-600">{{ user.total_logs }} entries</p>
                     </div>
                     <div class="flex-shrink-0">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
                             <i class="fas fa-fire text-xs mr-1"></i>
                             {{ user.streak }}
                         </span>

@@ -22,4 +22,8 @@ urlpatterns = [
     path('admin-panel/quotes/', views.manage_quotes, name='manage_quotes'),
     path('admin-panel/quotes/delete/<int:quote_id>/', views.delete_quote, name='delete_quote'),
     path('admin-panel/export-json/', views.export_data_json, name='export_data_json'),
+    path('my-jobs/', views.my_jobs, name='my_jobs'),
+    path('my-jobs/create/', views.create_job, name='create_job'),
+    path('my-jobs/edit/<int:job_id>/', views.edit_job, name='edit_job'),
+    path('my-jobs/delete/<int:job_id>/', views.delete_job, name='delete_job'),
 ]

@@ -148,6 +148,29 @@ class Effort(models.Model):
             return 100
         elapsed = (today - self.start_date).days
         return min(100, round(100 * elapsed / total_days, 1))
+
+
+class JobApplication(models.Model):
+    STATUS_CHOICES = [
+        ('applied', 'Applied'),
+        ('in_progress', 'In Progress'),
+        ('rejected', 'Rejected'),
+        ('awaiting_response', 'Awaiting Response'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_applications')
+    date = models.DateField()
+    job_link = models.URLField(max_length=500)
+    organization = models.CharField(max_length=200)
+    role = models.CharField(max_length=200)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='applied')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date', '-created_at']
+    
+    def __str__(self):
+        return f'{self.role} at {self.organization} ({self.date})'
     
     def days_remaining(self):
         """Days until end_date (negative if past)."""

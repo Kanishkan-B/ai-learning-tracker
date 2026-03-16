@@ -1,5 +1,5 @@
 from django import forms
-from .models import LearningLog, Effort, MotivationalQuote
+from .models import LearningLog, Effort, MotivationalQuote, JobApplication
 import base64
 
 class LearningLogForm(forms.ModelForm):
@@ -93,5 +93,32 @@ class MotivationalQuoteForm(forms.ModelForm):
             'author': forms.TextInput(attrs={
                 'class': 'input',
                 'placeholder': 'Author name (optional)',
+            }),
+        }
+
+
+class JobApplicationForm(forms.ModelForm):
+    class Meta:
+        model = JobApplication
+        fields = ['date', 'job_link', 'organization', 'role', 'status']
+        widgets = {
+            'date': forms.DateInput(attrs={
+                'class': 'input',
+                'type': 'date',
+            }),
+            'job_link': forms.URLInput(attrs={
+                'class': 'input',
+                'placeholder': 'https://company.com/careers/job-id',
+            }),
+            'organization': forms.TextInput(attrs={
+                'class': 'input',
+                'placeholder': 'e.g. Google, Microsoft, Amazon',
+            }),
+            'role': forms.TextInput(attrs={
+                'class': 'input',
+                'placeholder': 'e.g. Software Engineer, Data Scientist',
+            }),
+            'status': forms.Select(attrs={
+                'class': 'input',
             }),
         }

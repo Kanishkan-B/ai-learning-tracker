@@ -8,8 +8,8 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import base64
 import json
-from .models import LearningLog, UserProfile, MotivationalQuote, LearningActivity, Effort
-from .forms import LearningLogForm, SearchForm, EffortForm, CompleteEffortForm, MotivationalQuoteForm
+from .models import LearningLog, UserProfile, MotivationalQuote, LearningActivity, Effort, JobApplication
+from .forms import LearningLogForm, SearchForm, EffortForm, CompleteEffortForm, MotivationalQuoteForm, JobApplicationForm
 
 def is_admin(user):
     return user.is_superuser
@@ -383,3 +383,98 @@ def export_data_json(request):
     response['Content-Disposition'] = f'attachment; filename="ai_learning_tracker_export_{timezone.now().strftime("%Y%m%d_%H%M%S")}.json"'
     
     return response
+
+
+@login_required
+def my_jobs(request):
+    """Display all job applications grouped by date"""
+    # Get all job applications for the current user, ordered by date
+    jobs = JobApplication.objects.filter(user=request.user)
+    
+    # Group jobs by date
+    jobs_by_date = {}
+    for job in jobs:
+        date_str = job.date
+        if date_str not in jobs_by_date:
+            jobs_by_date[date_str] = []
+        jobs_by_date[date_str].append(job)
+    
+    context = {
+        'jobs_by_date': jobs_by_date,
+    }
+    return render(request, 'tracker/my_jobs.html', context)
+
+
+@login_required
+def create_job(request):
+    """Create multiple job applications for a single date"""
+    if request.method == 'POST':
+        # Check if we're adding jobs for a date
+        date = request.POST.get('date')
+        
+        if not date:
+            # First step: just get the date
+            return render(request, 'tracker/create_job.html', {})
+        
+        # Process multiple job entries
+        jobs_created = 0
+        for i in range(20):  # Maximum 20 entries
+            job_link = request.POST.get(f'job_link_{i}')
+            organization = request.POST.get(f'organization_{i}')
+            role = request.POST.get(f'role_{i}')
+            status = request.POST.get(f'status_{i}')
+            
+            # Skip if any field is empty
+            if not all([job_link, organization, role, status]):
+                continue
+            
+            # Create the job application
+            JobApplication.objects.create(
+                user=request.user,
+                date=date,
+                job_link=job_link,
+                organization=organization,
+                role=role,
+                status=status
+            )
+            jobs_created += 1
+        
+        if jobs_created > 0:
+            return redirect('my_jobs')
+        else:
+            # No jobs were created, show form again with date
+            context = {
+                'date': date,
+                'error': 'Please add at least one job application.'
+            }
+            return render(request, 'tracker/create_job.html', context)
+    
+    return render(request, 'tracker/create_job.html', {})
+
+
+@login_required
+def delete_job(request, job_id):
+    """Delete a job application"""
+    job = get_object_or_404(JobApplication, id=job_id, user=request.user)
+    job.delete()
+    return redirect('my_jobs')
+
+
+@login_required
+def edit_job(request, job_id):
+    """Edit a job application"""
+    job = get_object_or_404(JobApplication, id=job_id, user=request.user)
+    
+    if request.method == 'POST':
+        form = JobApplicationForm(request.POST, instance=job)
+        if form.is_valid():
+            form.save()
+            return redirect('my_jobs')
+    else:
+        form = JobApplicationForm(instance=job)
+    
+    context = {
+        'form': form,
+        'job': job,
+    }
+    return render(request, 'tracker/edit_job.html', context)
