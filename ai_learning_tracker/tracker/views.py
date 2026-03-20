@@ -6,8 +6,9 @@ from django.http import HttpResponse, JsonResponse
 from django.db.models import Q, Count
 from django.utils import timezone
 from datetime import datetime, timedelta
-import base64
 import json
+import urllib.request
+import urllib.error
 from .models import LearningLog, UserProfile, MotivationalQuote, LearningActivity, Effort, JobApplication
 from .forms import LearningLogForm, SearchForm, EffortForm, CompleteEffortForm, MotivationalQuoteForm, JobApplicationForm
 
@@ -130,15 +131,20 @@ def view_log(request, record_id):
 def download_file(request, record_id):
     log = get_object_or_404(LearningLog, record_id=record_id, user=request.user)
     
-    if not log.file_base64:
+    if not log.file_url:
         return HttpResponse('No file attached', status=404)
     
-    # Decode Base64 to binary
-    file_data = base64.b64decode(log.file_base64)
+    # Fetch bytes from Supabase Storage URL.
+    try:
+        with urllib.request.urlopen(log.file_url) as resp:
+            file_data = resp.read()
+    except (urllib.error.URLError, urllib.error.HTTPError):
+        return HttpResponse('Unable to fetch attached file', status=502)
     
     # Create HTTP response with file
-    response = HttpResponse(file_data, content_type=log.file_type)
-    response['Content-Disposition'] = f'attachment; filename="{log.file_name}"'
+    response = HttpResponse(file_data, content_type=log.file_type or 'application/octet-stream')
+    filename = (log.file_name or 'download').replace('"', "")
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return response
 
@@ -148,7 +154,7 @@ def my_magics(request):
     logs_with_files = LearningLog.objects.filter(
         user=request.user
     ).order_by('-date', '-created_at')
-    attachments_count = logs_with_files.exclude(file_base64__isnull=True).exclude(file_base64='').count()
+    attachments_count = logs_with_files.exclude(file_url__isnull=True).exclude(file_url='').count()
     
     context = {
         'logs_with_files': logs_with_files,
@@ -204,7 +210,7 @@ def user_entries(request, username):
     logs = LearningLog.objects.filter(
         user=target_user
     ).order_by('-date', '-created_at')
-    attachments_count = logs.exclude(file_base64__isnull=True).exclude(file_base64='').count()
+    attachments_count = logs.exclude(file_url__isnull=True).exclude(file_url='').count()
     
     context = {
         'target_user': target_user,
@@ -226,12 +232,18 @@ def download_file_public(request, record_id):
     """Download any user's attachment (used from shared views)"""
     log = get_object_or_404(LearningLog, record_id=record_id)
     
-    if not log.file_base64:
+    if not log.file_url:
         return HttpResponse('No file attached', status=404)
     
-    file_data = base64.b64decode(log.file_base64)
-    response = HttpResponse(file_data, content_type=log.file_type)
-    response['Content-Disposition'] = f'attachment; filename="{log.file_name}"'
+    try:
+        with urllib.request.urlopen(log.file_url) as resp:
+            file_data = resp.read()
+    except (urllib.error.URLError, urllib.error.HTTPError):
+        return HttpResponse('Unable to fetch attached file', status=502)
+
+    response = HttpResponse(file_data, content_type=log.file_type or 'application/octet-stream')
+    filename = (log.file_name or 'download').replace('"', "")
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
 
 @login_required
@@ -358,7 +370,7 @@ def export_data_json(request):
             'created_at': log.created_at.isoformat(),
             'file_name': log.file_name,
             'file_type': log.file_type,
-            'has_file': bool(log.file_base64)
+            'has_file': bool(log.file_url)
         })
     
     # Export quotes

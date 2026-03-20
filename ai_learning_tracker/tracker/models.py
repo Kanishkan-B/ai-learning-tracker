@@ -64,10 +64,10 @@ class LearningLog(models.Model):
     date = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     
-    # File storage using Base64
+    # File storage via Supabase Storage URL
     file_name = models.CharField(max_length=255, blank=True, null=True)
     file_type = models.CharField(max_length=100, blank=True, null=True)
-    file_base64 = models.TextField(blank=True, null=True)
+    file_url = models.TextField(blank=True, null=True)
     
     class Meta:
         ordering = ['-date', '-created_at']

@@ -94,7 +94,7 @@
                     <i class="fas fa-eye"></i>
                     <span>View</span>
                 </a>
-                {% if log.file_base64 %}
+                {% if log.file_url %}
                 <a href="{% url 'download_file_public' log.record_id %}" class="flex-1 btn-primary text-center text-xs py-2">
                     <i class="fas fa-download"></i>
                     <span>Download</span>

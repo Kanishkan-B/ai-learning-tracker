@@ -1,6 +1,8 @@
 from django import forms
 from .models import LearningLog, Effort, MotivationalQuote, JobApplication
-import base64
+import os
+
+from .supabase_storage import upload_to_supabase_storage
 
 class LearningLogForm(forms.ModelForm):
     file_upload = forms.FileField(required=False, label='Upload Document (Optional)')
@@ -20,15 +22,27 @@ class LearningLogForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Handle file upload and convert to Base64
-        if 'file_upload' in self.files:
-            uploaded_file = self.files['file_upload']
+        # Handle file upload and upload to Supabase Storage.
+        # Store the returned URL in `instance.file_url`.
+        uploaded_file = self.files.get('file_upload')
+        if uploaded_file and uploaded_file.size > 0:
+            if not instance.record_id:
+                instance.record_id = instance.generate_unique_id()
+
             instance.file_name = uploaded_file.name
             instance.file_type = uploaded_file.content_type
-            
-            # Read and encode file to Base64
-            file_content = uploaded_file.read()
-            instance.file_base64 = base64.b64encode(file_content).decode('utf-8')
+
+            # Use a deterministic object name per log record.
+            # If the user replaces the file, we overwrite the same path.
+            _, ext = os.path.splitext(uploaded_file.name or "")
+            ext = ext.lower() if ext else ""
+            object_path = f"learning_logs/{instance.record_id}/file{ext}"
+
+            instance.file_url = upload_to_supabase_storage(
+                file_obj=uploaded_file,
+                object_path=object_path,
+                content_type=uploaded_file.content_type,
+            )
         
         if commit:
             instance.save()
